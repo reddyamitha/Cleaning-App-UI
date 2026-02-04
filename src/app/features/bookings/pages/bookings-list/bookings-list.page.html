@@ -1,0 +1,123 @@
+<h2>Bookings</h2>
+
+<div style="display:flex; gap:8px; margin:8px 0 12px;">
+ <button (click)="setFilter('ALL')" [disabled]="filter() === 'ALL' || loading()">
+  All ({{ counts().all }})
+</button>
+
+<button (click)="setFilter('NEW')" [disabled]="filter() === 'NEW' || loading()">
+  New ({{ counts().new }})
+</button>
+
+<button (click)="setFilter('CONFIRMED')" [disabled]="filter() === 'CONFIRMED' || loading()">
+  Confirmed ({{ counts().confirmed }})
+</button>
+
+</div>
+
+
+<button (click)="refresh()" [disabled]="loading()" style="margin-bottom:12px;">
+  Refresh
+</button>
+
+<!-- Loading -->
+<div *ngIf="loading()">Loading…</div>
+
+<!-- Error -->
+<div *ngIf="!loading() && error()" style="color:crimson;">
+  {{ error() }}
+  <div>
+    <button (click)="refresh()" style="margin-top:8px;">Retry</button>
+  </div>
+</div>
+
+<div style="display:flex; gap:12px; align-items:center; margin:8px 0 12px;">
+  <label>
+    Page size:
+    <select
+  [value]="pageSize()"
+  (change)="setPageSize($any($event.target).value)"
+>
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+    </select>
+  </label>
+
+  <span>
+    Showing {{ pageRange().from }}–{{ pageRange().to }} of {{ pageRange().total }}
+  </span>
+</div>
+
+<div style="margin:8px 0 12px;">
+  <input
+    type="text"
+    placeholder="Search customer or address…"
+    [value]="query()"
+    (input)="onQuery($any($event.target).value)"
+    style="width: 320px; padding: 6px 8px;"
+  />
+</div>
+
+<div *ngIf="pendingDelete()" style="margin:8px 0; padding:10px; border:1px solid #ddd;">
+  Deleted {{ pendingDelete()!.booking.id }}.
+  <button (click)="undoDelete()" style="margin-left:8px;">Undo</button>
+</div>
+
+<!-- Table -->
+<table *ngIf="!loading() && !error() && pagedSortedVisibleItems().length" border="1" cellpadding="8" cellspacing="0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Customer</th>
+      <th>Address</th>
+      <th>When</th>
+      <th>Status</th>
+      <th>Total</th>
+      <th>Paid</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let b of pagedItems()">
+      <td>{{ b.id }}</td>
+      <td>{{ b.customerName }}</td>
+      <td>{{ b.address }}</td>
+      <td>{{ b.scheduledAtIso | date:'medium' }}</td>
+      <td><app-booking-status-badge [status]="b.status" /></td>
+      <td>{{ b.totalCad | currency:'CAD' }}</td>
+      <td>{{ b.paid ? 'Yes' : 'No' }}</td>
+      <td>
+        <button *ngIf="b.status === 'NEW'" (click)="confirm(b.id)" [disabled]="loading()">
+  Confirm
+</button>
+<button (click)="delete(b.id)" [disabled]="loading()">Delete</button>
+
+      </td>
+
+    </tr>
+  </tbody>
+</table>
+
+<div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
+  <button (click)="prev()" [disabled]="page() === 1 || loading()">Prev</button>
+
+  <span>Page {{ page() }} of {{ totalPages() }}</span>
+
+  <button (click)="next()" [disabled]="page() === totalPages() || loading()">Next</button>
+</div>
+
+<div style="display:flex; gap:8px; margin:0 0 12px;">
+  <button (click)="setSort('SCHEDULED_AT')" [disabled]="loading()">
+    Sort: When ({{ sortKey() === 'SCHEDULED_AT' ? sortDir() : '—' }})
+  </button>
+
+  <button (click)="setSort('TOTAL')" [disabled]="loading()">
+    Sort: Total ({{ sortKey() === 'TOTAL' ? sortDir() : '—' }})
+  </button>
+</div>
+
+<!-- Empty -->
+<div *ngIf="!loading() && !error() && !items().length">
+  No bookings yet.
+</div>

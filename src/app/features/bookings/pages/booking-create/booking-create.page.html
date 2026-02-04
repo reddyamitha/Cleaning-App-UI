@@ -1,0 +1,55 @@
+<h2>New Booking</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()" style="display:grid; gap:12px; max-width:520px;">
+
+  <div>
+    <label>Customer Name</label><br />
+    <input formControlName="customerName" />
+    <div *ngIf="form.controls.customerName.touched && form.controls.customerName.invalid" style="color:crimson;">
+      Required
+    </div>
+  </div>
+
+  <div>
+    <label>Address</label><br />
+    <input formControlName="address" />
+    <div *ngIf="form.controls.address.touched && form.controls.address.invalid" style="color:crimson;">
+      Required
+    </div>
+  </div>
+
+  <div>
+    <label>Unit Type</label><br />
+    <select formControlName="unitType">
+      <option value="1bed">1 Bedroom</option>
+      <option value="2bed">2 Bedroom</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Scheduled Date</label><br />
+    <input type="date" formControlName="scheduledDate" />
+    <div *ngIf="form.controls.scheduledDate.touched && form.controls.scheduledDate.invalid" style="color:crimson;">
+      Required
+    </div>
+  </div>
+
+  <div>
+    <label>Scheduled Time</label><br />
+    <input type="time" formControlName="scheduledTime" />
+    <div *ngIf="form.controls.scheduledTime.touched && form.controls.scheduledTime.invalid" style="color:crimson;">
+      Required
+    </div>
+  </div>
+
+  <div style="margin-top:4px;">
+    <strong>Estimated price:</strong> {{ priceCad | currency:'CAD' }}
+  </div>
+
+<div style="margin-top:8px;">
+  <button type="submit">
+    Create Booking
+  </button>
+</div>
+
+</form>
